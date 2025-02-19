@@ -12,7 +12,7 @@ on:
       anki_version:
         description: 'Anki Version'
         required: true
-        default: 'latest'  # Default to 'latest', you can modify this as needed
+        default: '25.02'  # Default to 'latest', you can modify this as needed
 
 jobs:
   build:
@@ -28,6 +28,21 @@ jobs:
       - name: Build Docker image
         run: |
           docker build --build-arg ANKI_VERSION=${{ github.event.inputs.anki_version }} -t your-image-name .
+
+      - name: Extract anki-sync-server binary
+        run: |
+          # Create a temporary directory to store the extracted binary
+          mkdir -p extracted
+          # Copy the binary from the builder image to the local file system
+          docker create --name temp-container your-image-name
+          docker cp temp-container:/anki-server/bin/anki-sync-server extracted/anki-sync-server
+          docker rm temp-container
+
+      - name: Upload anki-sync-server binary as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anki-sync-server-binary
+          path: extracted/anki-sync-server
 
       - name: Clean up
         run: docker system prune -f
