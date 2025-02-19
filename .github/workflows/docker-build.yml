@@ -1,0 +1,33 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      anki_version:
+        description: 'Anki Version'
+        required: true
+        default: 'latest'  # Default to 'latest', you can modify this as needed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          docker build --build-arg ANKI_VERSION=${{ github.event.inputs.anki_version }} -t your-image-name .
+
+      - name: Clean up
+        run: docker system prune -f
