@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build Sync Server
 
 on:
   workflow_dispatch:
